@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Telnyx SMS/MMS Gateway (API Gateway -> Lambda -> Secrets Manager -> Telnyx)
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 15
+    MemorySize: 512
+
+Parameters:
+  TelnyxSecretId:
+    Type: String
+    Default: prod/telnyx
+    Description: Secrets Manager secret name containing TELNYX_API_KEY
+  InternalGatewayToken:
+    Type: String
+    NoEcho: true
+    Description: Shared secret used by your Express server to call this gateway
+
+Resources:
+  MessagesApi:
+    Type: AWS::Serverless::HttpApi
+
+  SendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/handler.handler
+      Environment:
+        Variables:
+          TELNYX_SECRET_ID: !Ref TelnyxSecretId
+          INTERNAL_GATEWAY_TOKEN: !Ref InternalGatewayToken
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TelnyxSecretId}*
+
+      Events:
+        SendSms:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MessagesApi
+            Path: /sendSMS
+            Method: POST
+        SendMms:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MessagesApi
+            Path: /sendMMS
+            Method: POST
+
+Outputs:
+  ApiUrl:
+    Description: Base URL for the HTTP API
+    Value: !Sub "https://${MessagesApi}.execute-api.${AWS::Region}.amazonaws.com"

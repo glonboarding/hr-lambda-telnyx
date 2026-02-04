@@ -1,0 +1,21 @@
+# Dependencies
+node_modules
+
+# Environment & secrets
+.env
+samconfig.toml
+
+# SAM build output
+.aws-sam/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log

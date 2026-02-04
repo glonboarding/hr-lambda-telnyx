@@ -1,0 +1,10 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "telnyx-message-gateway"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = false
+resolve_s3 = true
+parameter_overrides = "TelnyxSecretId=prod/telnyx InternalGatewayToken=REPLACE_WITH_YOUR_TOKEN"
