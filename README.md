@@ -54,16 +54,16 @@ Store your Telnyx API key in AWS Secrets Manager before deploying:
 
 ```bash
 aws secretsmanager create-secret \
-  --name prod/telnyx \
-  --secret-string '{"TELNYX_API_KEY":"YOUR_TELNYX_API_KEY"}'
+  --name Telnyx-1 \
+  --secret-string "YOUR_TELNYX_API_KEY"
 ```
 
-Or as a plain string:
+Or as JSON:
 
 ```bash
 aws secretsmanager create-secret \
-  --name prod/telnyx \
-  --secret-string "YOUR_TELNYX_API_KEY"
+  --name Telnyx-1 \
+  --secret-string '{"TELNYX_API_KEY":"YOUR_TELNYX_API_KEY"}'
 ```
 
 ### 3. Configure deploy (optional)

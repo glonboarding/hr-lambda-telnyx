@@ -4,7 +4,7 @@ import {
 } from "@aws-sdk/client-secrets-manager";
 
 const REGION = process.env.AWS_REGION || "us-east-1";
-const SECRET_ID = process.env.TELNYX_SECRET_ID || "prod/telnyx";
+const SECRET_ID = process.env.TELNYX_SECRET_ID || "Telnyx-1";
 
 const sm = new SecretsManagerClient({ region: REGION });
 

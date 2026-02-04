@@ -52,7 +52,10 @@ export const handler = async (event) => {
     return resp(200, { ok: true, data: telnyxResp.data });
   } catch (err) {
     // IMPORTANT: do NOT console.log headers or axios error objects (can include auth)
-    const status = err.statusCode || 500;
-    return resp(status, { ok: false, error: err.message });
+    const status = err.statusCode || err.response?.status || 500;
+    const msg = err.response?.status === 401
+      ? "Telnyx rejected the API key (invalid, expired, or wrong format in Secrets Manager)"
+      : err.message;
+    return resp(status, { ok: false, error: msg });
   }
 };
