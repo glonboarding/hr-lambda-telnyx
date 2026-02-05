@@ -1,6 +1,6 @@
 import { requireInternalAuth } from "./auth.js";
 import { getTelnyxSecret } from "./secrets.js";
-import { sendTelnyxMessage } from "./telnyx.js";
+import { sendTelnyxMessage, sendTelnyxGroupMms } from "./telnyx.js";
 
 function resp(statusCode, payload) {
   return {
@@ -38,10 +38,13 @@ export const handler = async (event) => {
     // 3) Retrieve Telnyx key from Secrets Manager (never stored on Express/Vercel)
     const secret = await getTelnyxSecret();
 
-    // 4) Send message via Telnyx
-    const telnyxResp = await sendTelnyxMessage({
+    // 4) Send message via Telnyx (group_mms for /sendMMS, single message for /sendSMS)
+    const useGroupMms = path.endsWith("/sendMMS");
+    const toList = useGroupMms ? (Array.isArray(to) ? to : [to]) : to;
+    const sendFn = useGroupMms ? sendTelnyxGroupMms : sendTelnyxMessage;
+    const telnyxResp = await sendFn({
       apiKey: secret.TELNYX_API_KEY,
-      to,
+      to: toList,
       from,
       text,
       mediaUrls: isMms ? mediaUrls : undefined
