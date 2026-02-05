@@ -21,7 +21,7 @@ export const handler = async (event) => {
     if (method !== "POST") return resp(405, { ok: false, error: "Method not allowed" });
 
     const body = event.body ? JSON.parse(event.body) : {};
-    const { to, from, text, mediaUrls } = body;
+    const { to, from, text, mediaUrls, webhook_url, webhook_failover_url } = body;
 
     if (!to || !from || !text) {
       return resp(400, { ok: false, error: "Missing required fields: to, from, text" });
@@ -47,7 +47,8 @@ export const handler = async (event) => {
       to: toList,
       from,
       text,
-      mediaUrls: isMms ? mediaUrls : undefined
+      mediaUrls: isMms ? mediaUrls : undefined,
+      ...(useGroupMms ? {} : { webhook_url, webhook_failover_url })
     });
 
     return resp(200, { ok: true, data: telnyxResp.data });
