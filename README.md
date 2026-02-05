@@ -4,6 +4,10 @@ AWS SAM project that exposes API Gateway endpoints for sending SMS and MMS via [
 
 ## Architecture
 
+Request flow: **Client → Express server → API Gateway → Lambda → Telnyx**. The Telnyx API key stays in AWS Secrets Manager and is only used by the Lambda, never exposed to the Express server or client.
+
+![Backend proxy: Client → Express → API Gateway → Lambda → Telnyx (API key secured in Lambda)](backend_proxy.jpg)
+
 ```
 Express/Vercel Server
         │
