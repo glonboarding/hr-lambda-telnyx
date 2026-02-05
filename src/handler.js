@@ -33,9 +33,7 @@ export const handler = async (event) => {
     if (path.endsWith("/sendSMS") && isMms) {
       return resp(400, { ok: false, error: "MMS payload not allowed on /sendSMS (remove mediaUrls)" });
     }
-    if (path.endsWith("/sendMMS") && !isMms) {
-      return resp(400, { ok: false, error: "mediaUrls[] required for /sendMMS" });
-    }
+    // /sendMMS allows optional mediaUrls (text-only MMS is valid)
 
     // 3) Retrieve Telnyx key from Secrets Manager (never stored on Express/Vercel)
     const secret = await getTelnyxSecret();
