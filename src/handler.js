@@ -38,9 +38,9 @@ export const handler = async (event) => {
     // 3) Retrieve Telnyx key from Secrets Manager (never stored on Express/Vercel)
     const secret = await getTelnyxSecret();
 
-    // 4) Send message via Telnyx (group_mms for /sendMMS, single message for /sendSMS)
+    // 4) Send message via Telnyx (group_mms for /sendMMS, single/sequential for /sendSMS)
     const useGroupMms = path.endsWith("/sendMMS");
-    const toList = useGroupMms ? (Array.isArray(to) ? to : [to]) : to;
+    const toList = Array.isArray(to) ? to : [to];
     const sendFn = useGroupMms ? sendTelnyxGroupMms : sendTelnyxMessage;
     const telnyxResp = await sendFn({
       apiKey: secret.TELNYX_API_KEY,

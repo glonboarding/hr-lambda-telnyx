@@ -9,17 +9,33 @@ const telnyxRequest = (apiKey, body, path) =>
     timeout: 15000
   });
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const MSG_DELAY_MS = 120;
+
 export async function sendTelnyxMessage({ apiKey, to, from, text, mediaUrls, webhook_url, webhook_failover_url }) {
-  const body = { to, from, text };
+  const recipients = Array.isArray(to) ? to : [to];
 
-  // Telnyx uses media_urls for MMS
-  if (Array.isArray(mediaUrls) && mediaUrls.length > 0) {
-    body.media_urls = mediaUrls;
+  const buildBody = (singleTo) => {
+    const body = { to: singleTo, from, text };
+    if (Array.isArray(mediaUrls) && mediaUrls.length > 0) body.media_urls = mediaUrls;
+    if (webhook_url) body.webhook_url = webhook_url;
+    if (webhook_failover_url) body.webhook_failover_url = webhook_failover_url;
+    return body;
+  };
+
+  if (recipients.length === 1) {
+    return telnyxRequest(apiKey, buildBody(recipients[0]), "");
   }
-  if (webhook_url) body.webhook_url = webhook_url;
-  if (webhook_failover_url) body.webhook_failover_url = webhook_failover_url;
 
-  return telnyxRequest(apiKey, body, "");
+  const results = [];
+  for (let i = 0; i < recipients.length; i++) {
+    const resp = await telnyxRequest(apiKey, buildBody(recipients[i]), "");
+    results.push(resp.data?.data ?? resp.data);
+    if (i < recipients.length - 1) await delay(MSG_DELAY_MS);
+  }
+
+  return { data: { messages: results, count: results.length } };
 }
 
 /** Group MMS: to must be an array of phone numbers (max 8, US/CAN, long code). */
