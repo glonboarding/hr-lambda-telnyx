@@ -17,6 +17,13 @@ Parameters:
     Type: String
     NoEcho: true
     Description: Shared secret used by your Express server to call this gateway
+  SupabaseUrl:
+    Type: String
+    Description: Supabase project URL (e.g. https://xxx.supabase.co)
+  SupabaseServiceKey:
+    Type: String
+    NoEcho: true
+    Description: Supabase service role key (server-side only)
 
 Resources:
   MessagesApi:
@@ -50,6 +57,25 @@ Resources:
           Properties:
             ApiId: !Ref MessagesApi
             Path: /sendMMS
+            Method: POST
+
+  BurstSendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/burstHandler.handler
+      Timeout: 120
+      Environment:
+        Variables:
+          SUPABASE_URL: !Ref SupabaseUrl
+          SUPABASE_SERVICE_KEY: !Ref SupabaseServiceKey
+          INTERNAL_GATEWAY_TOKEN: !Ref InternalGatewayToken
+      Events:
+        SendBurstSms:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MessagesApi
+            Path: /sendBurstSMS
             Method: POST
 
 Outputs:

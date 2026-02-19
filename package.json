@@ -4,6 +4,7 @@
   "type": "module",
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.600.0",
+    "@supabase/supabase-js": "^2.47.10",
     "aws": "^0.0.3-2",
     "axios": "^1.7.7"
   }
