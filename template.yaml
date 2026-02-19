@@ -78,6 +78,25 @@ Resources:
             Path: /sendBurstSMS
             Method: POST
 
+  HandleBurstInboundFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/inboundBurstHandler.handler
+      Timeout: 25
+      Environment:
+        Variables:
+          SUPABASE_URL: !Ref SupabaseUrl
+          SUPABASE_SERVICE_KEY: !Ref SupabaseServiceKey
+          INTERNAL_GATEWAY_TOKEN: !Ref InternalGatewayToken
+      Events:
+        InboundBurst:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MessagesApi
+            Path: /inbound-burst
+            Method: POST
+
 Outputs:
   ApiUrl:
     Description: Base URL for the HTTP API
